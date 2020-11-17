@@ -10,13 +10,21 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(args: &[String]) -> Result<Config, &'static str> {
-        if args.len() < 3 {
-            return Err("not enough arguments");
-        }
-        let needle = args[1].clone();
-        let haystack = args[2].clone();
+    pub fn new(mut args: std::env::Args) -> Result<Config, &'static str> {
+        args.next();
+
+        let needle = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn't get a query string"),
+        };
+
+        let haystack = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn't get a file name"),
+        };
+
         let case_sensitive = env::var("CASE_INSENSITIVE").is_err();
+
         Ok(Config {
             needle,
             haystack,
@@ -41,13 +49,10 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 }
 
 pub fn search<'a>(needle: &str, haystack: &'a str) -> Vec<&'a str> {
-    let mut result = Vec::new();
-    for line in haystack.lines() {
-        if line.contains(needle) {
-            result.push(line);
-        }
-    }
-    result
+    haystack
+        .lines()
+        .filter(|line| line.contains(needle))
+        .collect()
 }
 
 pub fn search_case_insensitive<'a>(needle: &str, haystack: &'a str) -> Vec<&'a str> {
