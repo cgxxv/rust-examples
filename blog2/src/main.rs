@@ -1,15 +1,14 @@
-use blog::Post;
+use blog2::Post;
+
 fn main() {
     println!("Hello, world!");
-
     let mut post = Post::new();
 
     post.add_text("I ate a salad for launch today");
-    assert_eq!("", post.content());
 
-    post.request_review();
-    assert_eq!("", post.content());
+    let post = post.request_review();
 
-    post.approve();
+    let post = post.approve();
+
     assert_eq!("I ate a salad for launch today", post.content());
 }
