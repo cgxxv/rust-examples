@@ -26,7 +26,7 @@ pub fn eat_at_restaurant() {
 
     eat_at_restaurant_v3();
     eat_at_restaurant_v4();
-    back_of_house::fix_incorrect_order()
+    back_of_house::fix_incorrect_order();
 }
 
 mod demo;
