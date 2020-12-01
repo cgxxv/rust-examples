@@ -2,31 +2,34 @@ use std::env;
 
 #[derive(Debug)]
 pub struct Config {
-    pub needle: String,
-    pub haystack: String,
-    pub case_sensitive: bool,
+    pub file: String,
+    pub filter: String,
+    pub target: String,
 }
 
 impl Config {
-    pub fn new(mut args: std::env::Args) -> Result<Config, &'static str> {
+    pub fn new(mut args: env::Args) -> Result<Config, &'static str> {
         args.next();
 
-        let needle = match args.next() {
+        let file = match args.next() {
             Some(arg) => arg,
-            None => return Err("Didn't get a query string"),
+            None => return Err("请输入文件路径"),
         };
 
-        let haystack = match args.next() {
+        let filter = match args.next() {
             Some(arg) => arg,
-            None => return Err("Didn't get a file name"),
+            None => return Err("请输入要计算的列"),
         };
 
-        let case_sensitive = env::var("CASE_INSENSITIVE").is_err();
+        let target = match args.next() {
+            Some(arg) => arg,
+            None => return Err("请输入要保存的列"),
+        };
 
         Ok(Config {
-            needle,
-            haystack,
-            case_sensitive,
+            file,
+            filter,
+            target,
         })
     }
 }
