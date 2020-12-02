@@ -1,4 +1,4 @@
-use calamine::{open_workbook, DataType, Error, RangeDeserializerBuilder, Reader, Xlsx};
+use calamine::{open_workbook_auto, DataType, Reader, Sheets};
 use std::{env, process};
 
 fn main() {
@@ -19,37 +19,29 @@ mod config;
 
 fn demo(path: &str) {
     // opens a new workbook
-    let mut workbook: Xlsx<_> = open_workbook(path).expect("Cannot open file");
+    let mut workbook = open_workbook_auto(path).expect("Cannot open file");
 
     // Now get all formula!
-    let sheets = workbook.sheet_names().to_owned();
-    for s in sheets {
-        println!(
-            "found {} formula in '{}'",
-            workbook
-                .worksheet_formula(&s)
-                .expect("sheet not found")
-                .expect("error while getting formula")
-                .rows()
-                .flat_map(|r| r.iter().filter(|f| !f.is_empty()))
-                .count(),
-            s
-        );
-    }
+    // let sheets = workbook.sheet_names().to_owned();
+    // for s in sheets {
+    //     range(&s, &mut workbook);
+    // }
 
-    if let Some(Ok(r)) = workbook.worksheet_formula("广灵一斗泉一期") {
-        for row in r.rows() {
-            println!("row={:?}", row);
-        }
-    }
+    range("广灵一斗泉一期", &mut workbook);
+}
 
+fn range(sheet: &str, workbook: &mut Sheets) {
     // Read whole worksheet data and provide some statistics
-    if let Some(Ok(range)) = workbook.worksheet_range("广灵一斗泉一期") {
+    if let Some(Ok(range)) = workbook.worksheet_range(sheet) {
         let total_cells = range.get_size().0 * range.get_size().1;
         let non_empty_cells: usize = range.used_cells().count();
         println!(
-            "Found {} cells in 'Sheet1', including {} non empty cells",
-            total_cells, non_empty_cells
+            "Found {} (rows={},cols={}) cells in '{}', including {} non empty cells",
+            total_cells,
+            range.height(),
+            range.width(),
+            sheet,
+            non_empty_cells
         );
         // alternatively, we can manually filter rows
         assert_eq!(
@@ -59,22 +51,9 @@ fn demo(path: &str) {
                 .flat_map(|r| r.iter().filter(|&c| c != &DataType::Empty))
                 .count()
         );
-    }
 
-    example(path);
-}
-
-fn example(path: &str) {
-    let mut workbook: Xlsx<_> = open_workbook(path).expect("Can not open file");
-    let range = workbook
-        .worksheet_range("广灵一斗泉一期")
-        .expect("Cannot find 'Sheet1'");
-    let mut iter = RangeDeserializerBuilder::new()
-        .from_range(&range.unwrap())
-        .into_iter();
-
-    if let Some(result) = iter.next() {
-        let (value, label): (u32, String) = result.enumerate();
-        println!("label={}, value={}", label, value);
+        for i in 0..range.width() {
+            println!("{} {:?}", i, range.get_value((1, i as u32)));
+        }
     }
 }
