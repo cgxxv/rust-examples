@@ -2,3 +2,4 @@
 name = "art"
 version = "0.1.0"
 description = "A art library."
+edition = "2018"

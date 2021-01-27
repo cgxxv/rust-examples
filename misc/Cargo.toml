@@ -1,0 +1,20 @@
+[package]
+name = "misc"
+version = "0.1.0"
+authors = ["wk30 <foo_stacker@yeah.net>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+# [lib]
+# path = "src/lib.rs"
+
+[[bin]]
+name = "io-example"
+path = "src/io/main.rs"
+
+[[bin]]
+name = "cfg-example"
+path = "src/cfg/main.rs"
