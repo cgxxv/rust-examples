@@ -21,4 +21,14 @@ fn main() {
     }
 
     // `file` goes out of scope, and the "hello.txt" file gets closed
+
+    atty_example();
+}
+
+use atty::Stream;
+
+fn atty_example() {
+    println!("stdout? {}", atty::is(Stream::Stdout));
+    println!("stderr? {}", atty::is(Stream::Stderr));
+    println!("stdin? {}", atty::is(Stream::Stdin));
 }
