@@ -8,14 +8,31 @@ edition = "2018"
 
 [dependencies]
 atty = "0.2"
+json = "*"
 
 # [lib]
 # path = "src/lib.rs"
 
 [[bin]]
-name = "io-example"
+name = "io"
 path = "src/io/main.rs"
 
 [[bin]]
-name = "cfg-example"
+name = "cfg"
 path = "src/cfg/main.rs"
+
+[[bin]]
+name = "json"
+path = "src/json/main.rs"
+
+[[bin]]
+name = "loop"
+path = "src/loop/main.rs"
+
+[[bin]]
+name = "unsafe"
+path = "src/unsafe/main.rs"
+
+[[bin]]
+name = "trait"
+path = "src/trait/main.rs"
