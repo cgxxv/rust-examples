@@ -9,6 +9,9 @@ edition = "2018"
 [dependencies]
 atty = "0.2"
 json = "*"
+hello_macro = { path = "../hello_macro" }
+hello_macro_derive = { path = "../hello_macro/hello_macro_derive" }
+futures = "*"
 
 # [lib]
 # path = "src/lib.rs"
@@ -36,3 +39,15 @@ path = "src/unsafe/main.rs"
 [[bin]]
 name = "trait"
 path = "src/trait/main.rs"
+
+[[bin]]
+name = "afc"
+path = "src/afc/main.rs"
+
+[[bin]]
+name = "macro"
+path = "src/macro/main.rs"
+
+[[bin]]
+name = "async"
+path = "src/async/main.rs"
