@@ -16,7 +16,7 @@ fn main() {
     });
     println!("{:?}", leaf.parent.borrow().upgrade());
     println!(
-        "leaf\n strong_count: {}, weak_count: {}",
+        "leaf strong_count: {}, weak_count: {}",
         Rc::strong_count(&leaf),
         Rc::weak_count(&leaf)
     );
@@ -44,7 +44,7 @@ fn main() {
 
     println!("{:?}", leaf.parent.borrow().upgrade());
     println!(
-        "leaf\n strong_count: {}, weak_count: {}",
+        "leaf strong_count: {}, weak_count: {}",
         Rc::strong_count(&leaf),
         Rc::weak_count(&leaf)
     );
