@@ -1,3 +1,4 @@
+workspace = { members = ["learning/seven"] }
 [package]
 name = "rust-examples"
 version = "0.1.0"
