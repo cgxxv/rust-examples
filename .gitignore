@@ -2,3 +2,5 @@
 target
 *.xlsx
 Cargo.lock
+*.o
+*.a
