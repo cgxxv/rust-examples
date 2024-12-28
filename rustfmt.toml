@@ -1,0 +1,10 @@
+# edition = "2018"
+# newline_style = "Unix"
+# comments
+# normalize_comments = true
+# wrap_comments = true
+# imports
+
+reorder_imports = true             # 按字母排序
+group_imports = "StdExternalCrate" # 按标准库、外部依赖、本地模块分组
+imports_granularity = "Crate"      # 合并相同模块的 use

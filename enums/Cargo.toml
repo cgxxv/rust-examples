@@ -1,0 +1,9 @@
+[package]
+name = "enums"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# strum = { version = "0.26", features = ["derive"] }
+strum = "0.26"
+strum_macros = "0.26"
