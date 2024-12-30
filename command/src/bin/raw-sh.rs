@@ -1,7 +1,6 @@
 use std::{process::Command, str};
 
 use encoding_rs::GBK;
-use shell_words;
 
 fn main() {
     // let argv = &["python", "-c", "print('Hello world!')"];
@@ -30,7 +29,7 @@ fn main() {
     //     .wait()
     //     .expect("failed to wait for subprocess");
 
-    let output = Command::new(&argv[0])
+    let output = Command::new(argv[0])
         .args(&argv[1..])
         .output()
         .unwrap()
@@ -45,5 +44,52 @@ fn main() {
         }
     };
 
-    println!("Output:\n{}", output_str);
+    println!("Output: {}", output_str);
+    println!();
+
+    let args = vec![r#"echo "Test""#, "exit 0"];
+
+    let command = Command::new("sh").arg("-c").args(&args).output().unwrap();
+
+    println!("=> {:#?}", command);
+
+    let output = command.stdout;
+    // Try to decode as UTF-8 first, if it fails, try GBK
+    let output_str = match str::from_utf8(&output) {
+        Ok(v) => v.to_string(),
+        Err(_) => {
+            let (decoded, _, _) = GBK.decode(&output);
+            decoded.into_owned()
+        }
+    };
+
+    println!("Output: {}", output_str);
+    println!();
+
+    let command = Command::new("sh")
+        .arg("-c")
+        .arg(
+            r#"
+            echo "Setting up environment"
+            $VMName = "WindowsServer2022"
+            echo $VMName
+            exit 0
+            "#,
+        )
+        .output()
+        .unwrap();
+
+    println!("=> {:#?}", command);
+
+    let output = command.stdout;
+    // Try to decode as UTF-8 first, if it fails, try GBK
+    let output_str = match str::from_utf8(&output) {
+        Ok(v) => v.to_string(),
+        Err(_) => {
+            let (decoded, _, _) = GBK.decode(&output);
+            decoded.into_owned()
+        }
+    };
+
+    println!("Output: {}", output_str);
 }
