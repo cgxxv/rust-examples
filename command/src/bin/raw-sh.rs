@@ -15,12 +15,12 @@ fn main() {
     //     .expect("failed to wait for subprocess");
 
     //请用shell_words执行Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All，并打印输出结果
-    let argv = &[
-        "powershell",
-        "-Command",
-        "Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All",
-    ];
-    println!("Executing: {}", shell_words::join(argv));
+    // let argv = &[
+    //     "powershell",
+    //     "-Command",
+    //     "Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All",
+    // ];
+    // println!("Executing: {}", shell_words::join(argv));
 
     // std::process::Command::new(&argv[0])
     //     .args(&argv[1..])
@@ -29,27 +29,33 @@ fn main() {
     //     .wait()
     //     .expect("failed to wait for subprocess");
 
-    let output = Command::new(argv[0])
-        .args(&argv[1..])
-        .output()
-        .unwrap()
-        .stdout;
+    // let output = Command::new(argv[0])
+    //     .args(&argv[1..])
+    //     .output()
+    //     .unwrap()
+    //     .stdout;
 
-    // Try to decode as UTF-8 first, if it fails, try GBK
-    let output_str = match str::from_utf8(&output) {
-        Ok(v) => v.to_string(),
-        Err(_) => {
-            let (decoded, _, _) = GBK.decode(&output);
-            decoded.into_owned()
-        }
-    };
+    // // Try to decode as UTF-8 first, if it fails, try GBK
+    // let output_str = match str::from_utf8(&output) {
+    //     Ok(v) => v.to_string(),
+    //     Err(_) => {
+    //         let (decoded, _, _) = GBK.decode(&output);
+    //         decoded.into_owned()
+    //     }
+    // };
 
-    println!("Output: {}", output_str);
-    println!();
+    // println!("Output: {}", output_str);
+    // println!();
 
     let args = vec![r#"echo "Test""#, "exit 0"];
 
-    let command = Command::new("sh").arg("-c").args(&args).output().unwrap();
+    let command = Command::new("sh")
+        .arg("-c")
+        .arg(r#"echo "hello""#)
+        .arg(r#"echo "world""#)
+        .args(&args)
+        .output()
+        .unwrap();
 
     println!("=> {:#?}", command);
 
@@ -68,6 +74,8 @@ fn main() {
 
     let command = Command::new("sh")
         .arg("-c")
+        .arg(r#"echo "hello""#)
+        .arg(r#"echo "world""#)
         .arg(
             r#"
             echo "Setting up environment"

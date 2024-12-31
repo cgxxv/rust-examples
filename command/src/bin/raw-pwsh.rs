@@ -49,7 +49,13 @@ fn main() {
 
     let args = vec![r#"echo "Test""#, "exit 0"];
 
-    let command = Command::new("pwsh").arg("-c").args(&args).output().unwrap();
+    let command = Command::new("pwsh")
+        .arg("-c")
+        .arg(r#"echo "hello""#)
+        .arg(r#"echo "world""#)
+        .args(&args)
+        .output()
+        .unwrap();
 
     println!("=> {:#?}", command);
 
@@ -68,6 +74,8 @@ fn main() {
 
     let command = Command::new("pwsh")
         .arg("-c")
+        .arg(r#"echo "hello""#)
+        .arg(r#"echo "world""#)
         .arg(
             r#"
             echo "Setting up environment"
