@@ -1,0 +1,347 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'demo'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=demo",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "demo",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            // "initCommands": [
+            //     "type synthetic add -x '.*' -l lldb.formatters.rust.synthetics.VecSyntheticFrontEnd",
+            //     "type summary add -x -e '.*' \"${var}\"",
+            //     "settings set target.max-children-count 100",
+            //     "settings set target.max-string-summary-length 1000"
+            // ]
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'demo'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=demo",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "demo",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'duct'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=duct",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "duct",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'duct'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=duct",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "duct",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'multi-lines'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=multi-lines",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "multi-lines",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'multi-lines'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=multi-lines",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "multi-lines",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'raw-pwsh'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=raw-pwsh",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "raw-pwsh",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'raw-pwsh'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=raw-pwsh",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "raw-pwsh",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'raw-pwsh2'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=raw-pwsh2",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "raw-pwsh2",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'raw-pwsh2'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=raw-pwsh2",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "raw-pwsh2",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'raw-sh'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=raw-sh",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "raw-sh",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'raw-sh'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=raw-sh",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "raw-sh",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'run_script'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=run_script",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "run_script",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'run_script'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=run_script",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "run_script",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'shell_words-pwsh'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=shell_words-pwsh",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "shell_words-pwsh",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'shell_words-pwsh'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=shell_words-pwsh",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "shell_words-pwsh",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'xshell'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=xshell",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "xshell",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'xshell'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=xshell",
+                    "--package=command"
+                ],
+                "filter": {
+                    "name": "xshell",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

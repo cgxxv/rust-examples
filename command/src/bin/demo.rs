@@ -1,6 +1,14 @@
 use which::{which, which_global};
 
 fn main() {
+    println!("{}", std::env::var("PATH").unwrap());
+
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::TRACE)
+        .init();
+
+    // tracing::trace!("has a path seperator, so only CWD will be searched.");
+
     let program = "demo";
     let command = which(program); //.unwrap();
     println!("=> {:#?}", command);

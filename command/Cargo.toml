@@ -9,4 +9,11 @@ xshell = "0.2"
 run_script = "0.11"
 shell-words = "1.1"
 encoding_rs = "0.8"
-which = "7.0"
+tracing-subscriber = "0.3.19"
+tracing = "0.1.40"
+
+
+which = { version = "7.0", features = ["regex", "tracing"] }
+
+[profile.dev]
+debug = true
