@@ -1,0 +1,112 @@
+#![allow(unused)]
+
+use std::{any::Any, sync::Arc};
+
+pub type Result<T> = std::result::Result<T, Box<dyn Any + Send + Sync>>;
+
+pub trait Step {
+    fn run(&self, state: &dyn StateBag) -> Result<()>;
+    fn cleanup(&self, state: &dyn StateBag) -> Result<()>;
+}
+
+pub trait StateBag: Send + Sync {
+    fn contains(&self, key: &str) -> bool;
+}
+
+pub type StateBagValue = Arc<dyn Any + Send + Sync>;
+
+#[derive(Debug, Default)]
+pub struct BasicStateBag;
+
+impl StateBag for BasicStateBag {
+    fn contains(&self, key: &str) -> bool {
+        unimplemented!()
+    }
+}
+
+pub struct StepHello {
+    name: String,
+}
+
+impl StepHello {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+        }
+    }
+}
+
+impl Step for StepHello {
+    fn run(&self, state: &dyn StateBag) -> Result<()> {
+        println!("=> run: Hello, {}!", self.name);
+        Ok(())
+    }
+
+    fn cleanup(&self, state: &dyn StateBag) -> Result<()> {
+        println!("=> cleanup: Hello, {}!", self.name);
+        Ok(())
+    }
+}
+
+pub struct StepWorld {
+    name: String,
+}
+
+impl StepWorld {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+        }
+    }
+}
+
+impl Step for StepWorld {
+    fn run(&self, state: &dyn StateBag) -> Result<()> {
+        println!("=> run: World, {}!", self.name);
+        Ok(())
+    }
+
+    fn cleanup(&self, state: &dyn StateBag) -> Result<()> {
+        println!("=> cleanup: World, {}!", self.name);
+        Ok(())
+    }
+}
+
+pub struct StepMulti {
+    steps: Vec<Box<dyn Step>>,
+}
+
+impl StepMulti {
+    pub fn new(steps: Vec<Box<dyn Step>>) -> Self {
+        Self { steps }
+    }
+}
+
+impl Step for StepMulti {
+    fn run(&self, state: &dyn StateBag) -> Result<()> {
+        for step in &self.steps {
+            step.run(state)?;
+        }
+        Ok(())
+    }
+
+    fn cleanup(&self, state: &dyn StateBag) -> Result<()> {
+        for step in &self.steps {
+            step.cleanup(state)?;
+        }
+        Ok(())
+    }
+}
+
+#[tokio::main]
+async fn main() {
+    let steps: Vec<Box<dyn Step>> = vec![
+        Box::new(StepHello::new("Step 1")),
+        Box::new(StepWorld::new("Step 2")),
+    ];
+
+    let state = BasicStateBag;
+    let runner = StepMulti::new(steps);
+
+    runner.run(&state).unwrap();
+}

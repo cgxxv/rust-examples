@@ -1,0 +1,16 @@
+mod step;
+
+use step::{BasicStateBag, Step, StepHello, StepMulti, StepWorld};
+
+#[tokio::main]
+async fn main() {
+    let steps: Vec<Box<dyn Step>> = vec![
+        Box::new(StepHello::new("Step 1")),
+        Box::new(StepWorld::new("Step 2")),
+    ];
+
+    let state = BasicStateBag;
+    let runner = StepMulti::new(steps);
+
+    runner.run(state).await.unwrap();
+}

@@ -1,0 +1,125 @@
+#![allow(unused)]
+
+use std::{any::Any, sync::Arc};
+
+use async_trait::async_trait;
+
+pub type Result<T> = std::result::Result<T, Box<dyn Any + Send + Sync>>;
+
+#[async_trait]
+pub trait Step {
+    async fn run(&self, state: Arc<dyn StateBag>) -> Result<()>;
+    async fn cleanup(&self, state: Arc<dyn StateBag>) -> Result<()>;
+}
+
+pub trait StateBag: Send + Sync {
+    fn contains(&self, key: &str) -> bool;
+    fn get(&self, key: &str) -> Result<StateBagValue>;
+    fn update(&self, key: &str, new_value: StateBagValue) -> Result<()>;
+    fn insert<K: Into<String>>(&self, key: K, value: StateBagValue) -> Result<()>;
+    fn remove(&self, key: &str) -> Result<()>;
+}
+
+pub type StateBagValue = Arc<dyn Any + Send + Sync>;
+
+#[derive(Debug, Default)]
+pub struct BasicStateBag;
+
+impl StateBag for BasicStateBag {
+    fn contains(&self, key: &str) -> bool {
+        unimplemented!()
+    }
+
+    fn get(&self, key: &str) -> Result<StateBagValue> {
+        unimplemented!()
+    }
+
+    fn update(&self, key: &str, new_value: StateBagValue) -> Result<()> {
+        unimplemented!()
+    }
+
+    fn insert<K: Into<String>>(&self, key: K, value: StateBagValue) -> Result<()> {
+        unimplemented!()
+    }
+
+    fn remove(&self, key: &str) -> Result<()> {
+        unimplemented!()
+    }
+}
+
+pub struct StepHello {
+    name: String,
+}
+
+impl StepHello {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+        }
+    }
+}
+
+#[async_trait]
+impl Step for StepHello {
+    async fn run(&self, state: Arc<dyn StateBag>) -> Result<()> {
+        println!("=> run: Hello, {}!", self.name);
+        Ok(())
+    }
+
+    async fn cleanup(&self, state: Arc<dyn StateBag>) -> Result<()> {
+        println!("=> cleanup: Hello, {}!", self.name);
+        Ok(())
+    }
+}
+
+pub struct StepWorld {
+    name: String,
+}
+
+impl StepWorld {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+        }
+    }
+}
+
+#[async_trait]
+impl Step for StepWorld {
+    async fn run(&self, state: Arc<dyn StateBag>) -> Result<()> {
+        println!("=> run: World, {}!", self.name);
+        Ok(())
+    }
+
+    async fn cleanup(&self, state: Arc<dyn StateBag>) -> Result<()> {
+        println!("=> cleanup: World, {}!", self.name);
+        Ok(())
+    }
+}
+
+pub struct StepMulti {
+    steps: Vec<Box<dyn Step>>,
+}
+
+impl StepMulti {
+    pub fn new(steps: Vec<Box<dyn Step>>) -> Self {
+        Self { steps }
+    }
+}
+
+#[async_trait]
+impl Step for StepMulti {
+    async fn run(&self, state: Arc<dyn StateBag>) -> Result<()> {
+        for step in self.steps {
+            step.run(state.clone()).await?;
+        }
+        Ok(())
+    }
+
+    async fn cleanup(&self, state: Arc<dyn StateBag>) -> Result<()> {
+        for step in self.steps {
+            step.cleanup(state.clone()).await?;
+        }
+        Ok(())
+    }
+}
