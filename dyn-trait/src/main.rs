@@ -14,6 +14,10 @@ pub trait Step: Send + Sync {
 
 pub trait StateBag: Send + Sync {
     fn contains(&self, key: &str) -> bool;
+    fn get(&self, key: &str) -> Result<StateBagValue>;
+    fn update(&self, key: &str, new_value: StateBagValue) -> Result<()>;
+    fn insert(&self, key: Box<dyn AsRef<str>>, value: StateBagValue) -> Result<()>;
+    fn remove(&self, key: &str) -> Result<()>;
 }
 
 pub type StateBagValue = Arc<dyn Any + Send + Sync>;
@@ -23,6 +27,22 @@ pub struct BasicStateBag;
 
 impl StateBag for BasicStateBag {
     fn contains(&self, key: &str) -> bool {
+        unimplemented!()
+    }
+
+    fn get(&self, key: &str) -> Result<StateBagValue> {
+        unimplemented!()
+    }
+
+    fn update(&self, key: &str, new_value: StateBagValue) -> Result<()> {
+        unimplemented!()
+    }
+
+    fn insert(&self, key: Box<dyn AsRef<str>>, value: StateBagValue) -> Result<()> {
+        unimplemented!()
+    }
+
+    fn remove(&self, key: &str) -> Result<()> {
         unimplemented!()
     }
 }
