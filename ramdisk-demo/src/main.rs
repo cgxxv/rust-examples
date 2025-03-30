@@ -21,6 +21,7 @@ fn main() -> Result<()> {
     };
 
     let target_path = format!("{ramdisk_path}/{bin_name}");
+    println!("=> target_path: {target_path}");
     let mut file = fs::File::create(&target_path).expect("Failed to create file in memory");
     file.write_all(embeded_bin)
         .expect("Failed to write to file");

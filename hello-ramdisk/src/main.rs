@@ -6,7 +6,7 @@ fn main() {
     let external_exe = include_bytes!(concat!(env!("OUT_DIR"), "/hello.bin"));
 
     // 将可执行文件写入内存盘
-    let temp_path = "/dev/shm/external_tool";
+    let temp_path = "/dev/shm/hello_bin";
     let mut file = File::create(temp_path).expect("Failed to create file in memory");
     file.write_all(external_exe)
         .expect("Failed to write to file");
