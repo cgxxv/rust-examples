@@ -68,29 +68,35 @@ impl RemoteCmd {
         let (stdout_tx, mut stdout_rx) = mpsc::channel(32);
         let (stderr_tx, mut stderr_rx) = mpsc::channel(32);
 
-        // 包装原始输出
-        let stdout = self
-            .stdout
-            .take()
-            .unwrap_or_else(|| Box::pin(tokio::io::sink()));
-        let stderr = self
-            .stderr
-            .take()
-            .unwrap_or_else(|| Box::pin(tokio::io::sink()));
+        // 创建读写分离的管道
+        let (stdout_reader, stdout_writer) = tokio::io::split(
+            self.stdout
+                .take()
+                .unwrap_or_else(|| Box::pin(tokio::io::sink())),
+        );
+        let (stderr_reader, stderr_writer) = tokio::io::split(
+            self.stderr
+                .take()
+                .unwrap_or_else(|| Box::pin(tokio::io::sink())),
+        );
+
+        // 保留writer用于命令输出
+        self.stdout = Some(stdout_writer);
+        self.stderr = Some(stderr_writer);
 
         // 启动命令
         communicator.start(self).await?;
 
         // 输出处理任务
         let stdout_task = tokio::spawn(Self::pipe_output(
-            stdout,
+            stdout_reader,
             stdout_tx,
             ui.clone(),
             |ui, line| ui.message(line),
         ));
 
         let stderr_task = tokio::spawn(Self::pipe_output(
-            stderr,
+            stderr_reader,
             stderr_tx,
             ui.clone(),
             |ui, line| ui.error(line),
@@ -118,21 +124,21 @@ impl RemoteCmd {
     }
 
     /// 管道输出处理
-    async fn pipe_output<W, F>(
-        mut writer: Pin<Box<dyn AsyncWrite + Send>>,
+    async fn pipe_output<R, F>(
+        mut reader: R,
         sender: mpsc::Sender<String>,
         ui: Arc<dyn Ui>,
         callback: F,
     ) -> io::Result<()>
     where
-        W: AsyncWrite + Send + 'static,
+        R: AsyncRead + Unpin + Send + 'static,
         F: Fn(Arc<dyn Ui>, String) + Send + 'static,
     {
         let mut buffer = [0u8; 1024];
         let mut partial_line = String::new();
 
         loop {
-            let n = writer.read(&mut buffer).await?;
+            let n = reader.read(&mut buffer).await?;
             if n == 0 {
                 break;
             }
@@ -178,10 +184,10 @@ impl Ui for MyUi {
 struct MyCommunicator;
 #[async_trait]
 impl Communicator for MyCommunicator {
-    async fn start(&self, _cmd: &RemoteCmd) -> io::Result<()> {
-        // println!("Executing: {}", cmd.command);
-        // // 模拟命令执行
-        // tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+    async fn start(&self, cmd: &RemoteCmd) -> io::Result<()> {
+        println!("Executing: {}", cmd.command);
+        // 模拟命令执行
+        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
         Ok(())
     }
 }
