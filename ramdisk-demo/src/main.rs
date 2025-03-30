@@ -10,7 +10,7 @@ fn main() -> Result<()> {
     let bin_name = "hello.bin";
 
     // 从编译时嵌入的二进制数据加载
-    let embeded_bin = include_bytes!(concat!(env!("OUT_DIR"), "/{bin_name}"));
+    let embeded_bin = include_bytes!(concat!(env!("OUT_DIR"), "/hello.bin"));
 
     let ramdisk_path = if cfg!(target_os = "windows") {
         // Windows: 挂载到 R:\
