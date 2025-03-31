@@ -1,8 +1,8 @@
-use std::pin::Pin;
-use tokio::io::{self, AsyncReadExt, BufReader};
+use std::io::{self, BufReader, Read};
+
 use tokio::sync::mpsc;
 
-pub fn delim_reader(r: Pin<Box<dyn io::AsyncRead + Send>>, delim: u8) -> mpsc::Receiver<String> {
+pub fn delim_reader(r: Box<dyn Read + Send>, delim: u8) -> mpsc::Receiver<String> {
     let (tx, rx) = mpsc::channel(100);
 
     tokio::spawn(async move {
@@ -11,7 +11,7 @@ pub fn delim_reader(r: Pin<Box<dyn io::AsyncRead + Send>>, delim: u8) -> mpsc::R
 
         loop {
             let mut byte = [0u8];
-            match buf_reader.read_exact(&mut byte).await {
+            match buf_reader.read_exact(&mut byte) {
                 Ok(_) => {
                     line.push(byte[0]);
 
@@ -46,14 +46,14 @@ pub fn delim_reader(r: Pin<Box<dyn io::AsyncRead + Send>>, delim: u8) -> mpsc::R
 
 #[cfg(test)]
 mod test {
-    use tokio::fs::File;
+    use std::fs::File;
 
     use super::*;
 
     #[tokio::test]
     async fn test_delim_reader() {
-        let file = File::open("example.txt").await.unwrap();
-        let reader = Box::pin(file);
+        let file = File::open("example.txt").unwrap();
+        let reader = Box::new(file);
 
         let delim = b'\n'; // Newline delimiter
         let mut reader_channel = delim_reader(reader, delim);
