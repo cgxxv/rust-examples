@@ -1,15 +1,41 @@
 use async_trait::async_trait;
-use std::sync::Arc;
-use tokio::{
-    io::{self},
-    sync::Mutex,
-};
+use std::{process::Stdio, sync::Arc};
+use tokio::{io, process::Command, sync::Mutex};
 
 mod delim_reader;
 mod multi_writer;
 mod remote_cmd;
 
 use remote_cmd::{Communicator, RemoteCmd, Ui};
+
+struct MyCommunicator;
+#[async_trait]
+impl Communicator for MyCommunicator {
+    async fn start(&self, cmd: &RemoteCmd) -> io::Result<()> {
+        println!("Executing: {}", cmd.command);
+
+        let stdin = cmd.stdin.as_ref().map(|s| s.as_ref());
+        let stdout = cmd.stdout.as_ref().map(|s| s.as_ref());
+        let stderr = cmd.stderr.as_ref().map(|s| s.as_ref());
+
+        let stdin = stdin.unwrap_or_else(|| Stdio::null());
+        let stdout = stdout.unwrap_or_else(|| Stdio::null());
+        let stderr = stderr.unwrap_or_else(|| Stdio::null());
+
+        let mut command = Command::new("pwsh")
+            .arg("-c")
+            .arg(&cmd.command)
+            .stdin(stdin)
+            .stdout(stdout)
+            .stderr(stderr)
+            .spawn()?;
+
+        let status = command.wait().await?;
+        cmd.set_exited(status.code().unwrap_or(-1)).await;
+
+        Ok(())
+    }
+}
 
 struct MyUi;
 impl Ui for MyUi {
@@ -18,16 +44,6 @@ impl Ui for MyUi {
     }
     fn error(&self, msg: String) {
         println!("[ERR] {}", msg);
-    }
-}
-
-struct MyCommunicator;
-#[async_trait]
-impl Communicator for MyCommunicator {
-    async fn start(&self, cmd: &RemoteCmd) -> io::Result<()> {
-        println!("Executing: {}", cmd.command);
-
-        Ok(())
     }
 }
 

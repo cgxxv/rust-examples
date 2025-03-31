@@ -1,4 +1,4 @@
-use std::{pin::Pin, sync::Arc};
+use std::{pin::Pin, process::Stdio, sync::Arc};
 
 use async_trait::async_trait;
 use tokio::{
@@ -11,9 +11,9 @@ use crate::{delim_reader::delim_reader, multi_writer::MultiWriter};
 /// 远程命令表示
 pub struct RemoteCmd {
     pub command: String,
-    stdin: Option<Pin<Box<dyn AsyncRead + Send>>>,
-    stdout: Option<Pin<Box<dyn AsyncWrite + Send>>>,
-    stderr: Option<Pin<Box<dyn AsyncWrite + Send>>>,
+    pub stdin: Option<Pin<Box<dyn AsyncRead + Send + Sync>>>,
+    pub stdout: Option<Pin<Box<dyn AsyncWrite + Send + Sync>>>,
+    pub stderr: Option<Pin<Box<dyn AsyncWrite + Send + Sync>>>,
     exit_status: Arc<Mutex<Option<i32>>>,
     exit_notify: watch::Sender<()>,
 }
@@ -44,19 +44,19 @@ impl RemoteCmd {
     }
 
     /// 设置标准输入
-    pub fn set_stdin<R: AsyncRead + Send + 'static>(mut self, reader: R) -> Self {
+    pub fn set_stdin<R: AsyncRead + Send + Sync + 'static>(mut self, reader: R) -> Self {
         self.stdin = Some(Box::pin(reader));
         self
     }
 
     /// 设置标准输出
-    pub fn set_stdout<W: AsyncWrite + Send + 'static>(mut self, writer: W) -> Self {
+    pub fn set_stdout<W: AsyncWrite + Send + Sync + 'static>(mut self, writer: W) -> Self {
         self.stdout = Some(Box::pin(writer));
         self
     }
 
     /// 设置标准错误
-    pub fn set_stderr<W: AsyncWrite + Send + 'static>(mut self, writer: W) -> Self {
+    pub fn set_stderr<W: AsyncWrite + Send + Sync + 'static>(mut self, writer: W) -> Self {
         self.stderr = Some(Box::pin(writer));
         self
     }
@@ -85,7 +85,7 @@ impl RemoteCmd {
         } else {
             self.stdout = Some(Box::pin(MultiWriter(vec![
                 self.stdout.take().unwrap(),
-                Box::pin(stdout_w) as Pin<Box<dyn AsyncWrite + Send>>,
+                Box::pin(stdout_w) as Pin<Box<dyn AsyncWrite + Send + Sync>>,
             ])));
         }
 
@@ -94,7 +94,7 @@ impl RemoteCmd {
         } else {
             self.stderr = Some(Box::pin(MultiWriter(vec![
                 self.stderr.take().unwrap(),
-                Box::pin(stderr_w) as Pin<Box<dyn AsyncWrite + Send>>,
+                Box::pin(stderr_w) as Pin<Box<dyn AsyncWrite + Send + Sync>>,
             ])));
         }
 
