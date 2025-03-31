@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use os_pipe::pipe;
 use std::{
     io,
     process::{Command, Stdio},
