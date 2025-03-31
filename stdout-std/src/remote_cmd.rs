@@ -4,7 +4,7 @@ use std::{
 };
 
 use async_trait::async_trait;
-use pipe::pipe;
+use os_pipe::pipe;
 use tokio::sync::{Mutex, watch};
 
 use crate::{delim_reader::delim_reader, multi_writer::MultiWriter};
@@ -69,8 +69,8 @@ impl RemoteCmd {
         ui: Arc<dyn Ui>,
     ) -> io::Result<i32> {
         // 创建管道
-        let (stdout_r, stdout_w) = pipe();
-        let (stderr_r, stderr_w) = pipe();
+        let (stdout_r, stdout_w) = pipe()?;
+        let (stderr_r, stderr_w) = pipe()?;
 
         // 包装原始输出
         if self.stdout.is_none() {

@@ -6,4 +6,5 @@ edition = "2024"
 [dependencies]
 tokio = { version = "1.42", features = ["full"] }
 async-trait = "0.1"
-pipe = "0.4"
+# pipe = "0.4"
+os_pipe = "1.2.1"

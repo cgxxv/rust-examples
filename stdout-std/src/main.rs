@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use os_pipe::pipe;
 use std::{
     io,
     process::{Command, Stdio},
@@ -17,11 +18,16 @@ impl Communicator for MyCommunicator {
     async fn start(&self, cmd: &mut RemoteCmd) -> io::Result<()> {
         println!("Executing: {}", cmd.command);
 
+        // let (stdout_pipe_r, stdout_pipe_w) = pipe()?;
+        // let (stderr_pipe_r, stderr_pipe_w) = pipe()?;
+
         let mut command = Command::new("pwsh")
             .arg("-c")
             .arg(&cmd.command)
             .stdin(Stdio::piped())
+            // .stdout(Stdio::from(stdout_pipe_w))
             .stdout(Stdio::piped())
+            // .stderr(Stdio::from(stderr_pipe_w))
             .stderr(Stdio::piped())
             .spawn()?;
 
@@ -40,6 +46,7 @@ impl Communicator for MyCommunicator {
             Ok::<(), io::Error>(())
         });
 
+        // let mut stdout_r = stdout_pipe_r;
         let mut stdout_r = command.stdout.take().unwrap();
         let mut stdout_w = cmd.stdout.take().unwrap();
 
@@ -55,6 +62,7 @@ impl Communicator for MyCommunicator {
             Ok::<(), io::Error>(())
         });
 
+        // let mut stderr_r = stderr_pipe_r;
         let mut stderr_r = command.stderr.take().unwrap();
         let mut stderr_w = cmd.stderr.take().unwrap();
 
