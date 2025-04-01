@@ -5,6 +5,7 @@
 # wrap_comments = true
 # imports
 
-reorder_imports = true             # 按字母排序
-group_imports = "StdExternalCrate" # 按标准库、外部依赖、本地模块分组
-imports_granularity = "Crate"      # 合并相同模块的 use
+newline_style = "Unix"
+reorder_imports = true
+group_imports = "StdExternalCrate"
+imports_granularity = "Crate"
