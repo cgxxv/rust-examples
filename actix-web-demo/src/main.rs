@@ -1,5 +1,6 @@
 use std::{
     error::Error,
+    fs,
     future::{self, Ready},
     net::Ipv4Addr,
 };
@@ -12,10 +13,7 @@ use actix_web::{
 use actix_web_httpauth::middleware::HttpAuthentication;
 use futures::future::LocalBoxFuture;
 use serde::{Deserialize, Serialize};
-use utoipa::{
-    Modify, OpenApi, ToSchema,
-    openapi::security::{ApiKey, ApiKeyValue, HttpAuthScheme, HttpBuilder, SecurityScheme},
-};
+use utoipa::{OpenApi, ToSchema};
 use utoipa_actix_web::AppExt;
 use utoipa_rapidoc::RapiDoc;
 use utoipa_redoc::{Redoc, Servable};
@@ -24,29 +22,12 @@ use utoipa_swagger_ui::SwaggerUi;
 
 mod account;
 mod auth;
+mod doc;
 mod org;
 mod user;
 
 const API_KEY_NAME: &str = "todo_apikey";
 const API_KEY: &str = "utoipa-rocks";
-
-#[derive(OpenApi)]
-#[openapi(
-    // 统一前缀的方式
-    // servers(
-    //     (url = "/api/v1", description = "API 主服务器"),
-    //     (url = "/api/v1/staging", description = "测试服务器"),
-    // ),
-    components(
-        schemas(user::User),
-    ),
-    tags(
-        (name = "orgs", description = "Org management"),
-        (name = "users", description = "User management")
-    ),
-    modifiers(&SecurityAddon)
-)]
-struct ApiDoc;
 
 /// Todo endpoint error responses
 #[derive(Serialize, Deserialize, Clone, ToSchema)]
@@ -62,6 +43,10 @@ pub enum ErrorResponse {
 #[actix_web::main]
 async fn main() -> Result<(), impl Error> {
     env_logger::init();
+
+    // 生成 YAML 格式
+    let yaml_value = serde_yaml::to_string(&doc::ApiDoc::openapi()).unwrap();
+    fs::write("openapi.yaml", yaml_value).unwrap();
 
     let jwt_config = auth::jwt::JwtConfig::new("your-secret-key".to_string(), 24);
 
@@ -90,7 +75,7 @@ async fn main() -> Result<(), impl Error> {
         let auth_middleware = auth::middleware::JwtAuth::new(jwt_config.clone());
         App::new()
             .into_utoipa_app()
-            .openapi(ApiDoc::openapi())
+            .openapi(doc::ApiDoc::openapi())
             .map(|app| app.wrap(Logger::default()))
             .service(
                 utoipa_actix_web::scope("/api/v1")
@@ -124,27 +109,6 @@ async fn main() -> Result<(), impl Error> {
     .bind((Ipv4Addr::UNSPECIFIED, 8088))?
     .run()
     .await
-}
-
-struct SecurityAddon;
-
-impl Modify for SecurityAddon {
-    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
-        let components = openapi.components.as_mut().unwrap(); // we can unwrap safely since there already is components registered.
-        // components.add_security_scheme(
-        //     "api_key",
-        //     SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new("todo_apikey"))),
-        // );
-        components.add_security_scheme(
-            "bearer_token",
-            SecurityScheme::Http(
-                HttpBuilder::new()
-                    .scheme(HttpAuthScheme::Bearer)
-                    .bearer_format("JWT")
-                    .build(),
-            ),
-        );
-    }
 }
 
 /// Require api key middleware will actually require valid api key
