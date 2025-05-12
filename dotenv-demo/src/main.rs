@@ -12,7 +12,9 @@ fn main() {
     dotenvy::dotenv().ok();
 
     // 从环境变量中解析为 Config 结构体
-    let config: Config = envy::from_env().expect("Failed to load config from environment");
+    let config: Config = envy::prefixed("DEMO_")
+        .from_env::<Config>()
+        .expect("Failed to load config from environment");
 
     println!("{:#?}", config);
 }
