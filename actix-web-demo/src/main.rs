@@ -84,7 +84,7 @@ async fn main() -> Result<(), impl Error> {
                     )
                     .service(
                         utoipa_actix_web::scope("/orgs")
-                            .wrap(HttpAuthentication::bearer(auth::jwt_v2::validator))
+                            // .wrap(HttpAuthentication::bearer(auth::jwt_v2::validator))
                             .configure(org::configure_utoipa()),
                     )
                     .service(

@@ -16,12 +16,15 @@ pub(super) fn configure() -> impl FnOnce(&mut ServiceConfig) {
 pub(super) fn configure_utoipa() -> impl FnOnce(&mut utoipa_actix_web::service_config::ServiceConfig)
 {
     |config: &mut utoipa_actix_web::service_config::ServiceConfig| {
-        config.service(handle_repo).service(handle_orgs);
+        config.service(
+            utoipa_actix_web::scope("/{orgs:.+}")
+                .service(handle_repo)
+                .service(handle_orgs),
+        );
     }
 }
 
 #[utoipa::path(
-    // context_path = "/api/org",
     responses(
         (status = 200, description = "handle repository with nested groups", body = String)
     ),
@@ -31,7 +34,7 @@ pub(super) fn configure_utoipa() -> impl FnOnce(&mut utoipa_actix_web::service_c
     ),
     tag = ORGS
 )]
-#[get("/{orgs:.+}/{repo}")] // `.+` 表示至少一个 org，后面必须跟一个 repo
+#[get("/{repo}")] // `.+` 表示至少一个 org，后面必须跟一个 repo
 async fn handle_repo(path: web::Path<(String, String)>) -> impl Responder {
     let (orgs, repo) = path.into_inner();
     let org_list: Vec<&str> = orgs.split('/').collect();
@@ -49,7 +52,7 @@ async fn handle_repo(path: web::Path<(String, String)>) -> impl Responder {
     ),
     tag = ORGS
 )]
-#[get("/{orgs:.+}")]
+#[get("")]
 async fn handle_orgs(path: web::Path<String>) -> impl Responder {
     let orgs = path.into_inner();
     let org_list: Vec<&str> = orgs.split('/').collect();
