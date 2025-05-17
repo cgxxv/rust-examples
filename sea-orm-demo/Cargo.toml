@@ -1,0 +1,10 @@
+[package]
+name = "sea-orm-demo"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members = [".", "api", "service", "entity", "migration"]
+
+[dependencies]
+actix-example-api = { path = "api" }
