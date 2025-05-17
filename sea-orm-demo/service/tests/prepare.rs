@@ -1,4 +1,4 @@
-use ::entity::post;
+use ::entity::posts as post;
 use sea_orm::*;
 
 #[cfg(feature = "mock")]

@@ -7,7 +7,7 @@ use actix_web::{
     error, get, middleware, post, web, App, Error, HttpRequest, HttpResponse, HttpServer, Result,
 };
 
-use entity::post;
+use entity::posts as post;
 use listenfd::ListenFd;
 use migration::{Migrator, MigratorTrait};
 use serde::{Deserialize, Serialize};

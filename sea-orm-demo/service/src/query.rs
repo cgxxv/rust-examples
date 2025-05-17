@@ -1,4 +1,4 @@
-use ::entity::{post, post::Entity as Post};
+use ::entity::{posts as post, posts::Entity as Post};
 use sea_orm::*;
 
 pub struct Query;
