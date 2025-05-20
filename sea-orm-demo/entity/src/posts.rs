@@ -23,6 +23,7 @@ pub struct Model {
     pub status: CheckStatus,
     pub params: Params,
     pub kvs: Option<Kvs>,
+    pub parent_id: Option<i32>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, EnumIter, DeriveActiveEnum)]
@@ -59,6 +60,7 @@ pub enum Column {
     Status,
     Params,
     Kvs,
+    ParentId,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DerivePrimaryKey)]
@@ -73,8 +75,14 @@ impl PrimaryKeyTrait for PrimaryKey {
     }
 }
 
-#[derive(Copy, Clone, Debug, EnumIter)]
-pub enum Relation {}
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+pub enum Relation {
+    #[sea_orm(has_many = "Entity")] // 关键点：必须是 has_many
+    Children,
+
+    #[sea_orm(belongs_to = "Entity", from = "Column::ParentId", to = "Column::Id")]
+    Parent,
+}
 
 impl ColumnTrait for Column {
     type EntityName = Entity;
@@ -86,13 +94,25 @@ impl ColumnTrait for Column {
             Self::Status => ColumnType::String(StringLen::N(20u32)).def(),
             Self::Params => ColumnType::Json.def(),
             Self::Kvs => ColumnType::Json.def().null(),
+            Self::ParentId => ColumnType::Integer.def().null(),
         }
     }
 }
 
-impl RelationTrait for Relation {
-    fn def(&self) -> RelationDef {
-        panic!("No RelationDef")
+impl Related<Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Children.def()
+    }
+}
+
+pub struct ChildrenLink;
+
+impl Linked for ChildrenLink {
+    type FromEntity = Entity;
+    type ToEntity = Entity;
+
+    fn link(&self) -> Vec<RelationDef> {
+        vec![Relation::Parent.def().rev()]
     }
 }
 
@@ -120,12 +140,14 @@ mod tests {
                 foo: Some("Foo".to_string()),
             },
             kvs: None,
+            parent_id: Some(1),
         };
         ActiveModel {
             title: Set(form_data.title.to_owned()),
             text: Set(form_data.text.to_owned()),
             status: Set(form_data.status.to_owned()),
             params: Set(form_data.params.to_owned()),
+            parent_id: Set(form_data.parent_id),
             ..Default::default()
         }
         .save(&conn)
@@ -180,6 +202,7 @@ mod tests {
                 map.insert("Hello".to_string(), "World".to_string());
                 Some(Kvs(map))
             },
+            parent_id: None,
         };
         ActiveModel {
             title: Set(form_data.title.to_owned()),
@@ -192,5 +215,62 @@ mod tests {
         .save(&conn)
         .await
         .unwrap();
+    }
+
+    #[tokio::test]
+    async fn test_list_todo_with_children() {
+        // get env vars
+        dotenvy::dotenv().ok();
+        let db_url = std::env::var("DATABASE_URL").expect("DATABASE_URL is not set in .env file");
+        let conn = Database::connect(&db_url).await.unwrap();
+
+        let page = 1;
+        let posts_per_page = 10;
+        let id = 1;
+
+        let paginator = Entity::find()
+            .filter(Column::Id.eq(id))
+            .find_also_linked(ChildrenLink)
+            .order_by_asc(Column::Id)
+            .paginate(&conn, posts_per_page);
+        let num_pages = paginator.num_pages().await.unwrap();
+
+        // Fetch paginated posts
+        let posts = paginator
+            .fetch_page(page - 1)
+            .await
+            .map(|p| (p, num_pages))
+            .unwrap();
+
+        println!("=> {:#?}", posts);
+        println!("=> {}", serde_json::to_string(&posts.0).unwrap());
+    }
+
+    #[tokio::test]
+    async fn test_list_child_todos() {
+        // get env vars
+        dotenvy::dotenv().ok();
+        let db_url = std::env::var("DATABASE_URL").expect("DATABASE_URL is not set in .env file");
+        let conn = Database::connect(&db_url).await.unwrap();
+
+        let page = 1;
+        let posts_per_page = 10;
+        let parent_id = 1;
+
+        let paginator = Entity::find()
+            .filter(Column::ParentId.eq(parent_id))
+            .order_by_asc(Column::Id)
+            .paginate(&conn, posts_per_page);
+        let num_pages = paginator.num_pages().await.unwrap();
+
+        // Fetch paginated posts
+        let posts = paginator
+            .fetch_page(page - 1)
+            .await
+            .map(|p| (p, num_pages))
+            .unwrap();
+
+        println!("=> {:#?}", posts);
+        println!("=> {}", serde_json::to_string(&posts.0).unwrap());
     }
 }

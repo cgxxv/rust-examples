@@ -23,4 +23,5 @@ features = [
   "runtime-async-std",
   "sqlx-mysql",
   "with-json",
+  "macros",
 ]
