@@ -7,7 +7,7 @@ use actix_web::{
     error, get, middleware, post, web, App, Error, HttpRequest, HttpResponse, HttpServer, Result,
 };
 
-use entity::posts as post;
+use entity::posts;
 use listenfd::ListenFd;
 use migration::{Migrator, MigratorTrait};
 use serde::{Deserialize, Serialize};
@@ -76,7 +76,7 @@ async fn new(data: web::Data<AppState>) -> Result<HttpResponse, Error> {
 #[post("/")]
 async fn create(
     data: web::Data<AppState>,
-    post_form: web::Form<post::Model>,
+    post_form: web::Form<posts::Model>,
 ) -> Result<HttpResponse, Error> {
     let conn = &data.conn;
 
@@ -97,7 +97,7 @@ async fn edit(data: web::Data<AppState>, id: web::Path<i32>) -> Result<HttpRespo
     let template = &data.templates;
     let id = id.into_inner();
 
-    let post: Option<post::Model> = Query::find_post_by_id(conn, id)
+    let post: Option<posts::Model> = Query::find_post_by_id(conn, id)
         .await
         .expect("could not find post");
 
@@ -125,7 +125,7 @@ async fn edit(data: web::Data<AppState>, id: web::Path<i32>) -> Result<HttpRespo
 async fn update(
     data: web::Data<AppState>,
     id: web::Path<i32>,
-    post_form: web::Form<post::Model>,
+    post_form: web::Form<posts::Model>,
 ) -> Result<HttpResponse, Error> {
     let conn = &data.conn;
     let form = post_form.into_inner();
