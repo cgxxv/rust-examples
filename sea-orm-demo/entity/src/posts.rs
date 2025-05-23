@@ -211,6 +211,32 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_list_todos_with_in_empty() {
+        tracing_subscriber::fmt()
+            .with_max_level(tracing::Level::DEBUG)
+            .with_test_writer()
+            .init();
+
+        // get env vars
+        dotenvy::dotenv().ok();
+        let db_url = std::env::var("DATABASE_URL").expect("DATABASE_URL is not set in .env file");
+        let mut opt = ConnectOptions::new(db_url);
+        opt.sqlx_logging(false) // Disable SQLx log
+            .sqlx_logging_level(log::LevelFilter::Info);
+        let conn = Database::connect(opt).await.unwrap();
+
+        let empty_ids: Vec<i64> = vec![];
+        let posts = Entity::find()
+            .filter(Column::Id.is_in(empty_ids))
+            .order_by_asc(Column::Id)
+            .all(&conn)
+            .await
+            .unwrap();
+
+        println!("=> {:#?}", posts);
+    }
+
+    #[tokio::test]
     async fn test_create_todo_with_kvs() {
         // get env vars
         dotenvy::dotenv().ok();
