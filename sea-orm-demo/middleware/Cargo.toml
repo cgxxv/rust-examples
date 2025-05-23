@@ -1,0 +1,8 @@
+[package]
+name = "middleware"
+version = "0.0.0"
+edition = "2024"
+
+[dependencies]
+actix-web = "4"
+futures-util = "0.3"

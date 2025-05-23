@@ -7,6 +7,7 @@ use actix_web::{
     error, get, middleware, post, web, App, Error, HttpRequest, HttpResponse, HttpServer, Result,
 };
 
+use ::middleware::{Permission, Role, SayHi};
 use entity::posts;
 use listenfd::ListenFd;
 use migration::{Migrator, MigratorTrait};
@@ -34,7 +35,11 @@ struct FlashData {
     message: String,
 }
 
-#[get("/")]
+#[get(
+    "/",
+    wrap = r#"SayHi::new("all", Role::Owner, vec![Permission::All])"#,
+    wrap = r#"SayHi::new("list", Role::Saler, vec![Permission::Check, Permission::Publish])"#
+)]
 async fn list(req: HttpRequest, data: web::Data<AppState>) -> Result<HttpResponse, Error> {
     let template = &data.templates;
     let conn = &data.conn;
@@ -63,7 +68,10 @@ async fn list(req: HttpRequest, data: web::Data<AppState>) -> Result<HttpRespons
     Ok(HttpResponse::Ok().content_type("text/html").body(body))
 }
 
-#[get("/new")]
+#[get(
+    "/new",
+    wrap = r#"SayHi::new("new", Role::Manager, vec![Permission::Publish])"#
+)]
 async fn new(data: web::Data<AppState>) -> Result<HttpResponse, Error> {
     let template = &data.templates;
     let ctx = tera::Context::new();
@@ -73,7 +81,10 @@ async fn new(data: web::Data<AppState>) -> Result<HttpResponse, Error> {
     Ok(HttpResponse::Ok().content_type("text/html").body(body))
 }
 
-#[post("/")]
+#[post(
+    "/",
+    wrap = r#"SayHi::new("create", Role::Owner, vec![Permission::All])"#
+)]
 async fn create(
     data: web::Data<AppState>,
     post_form: web::Form<posts::Model>,
@@ -91,7 +102,10 @@ async fn create(
         .finish())
 }
 
-#[get(r#"/{id:\d+}"#)]
+#[get(
+    r#"/{id:\d+}"#,
+    wrap = r#"SayHi::new("edit", Role::Manager, vec![Permission::Publish])"#
+)]
 async fn edit(data: web::Data<AppState>, id: web::Path<i32>) -> Result<HttpResponse, Error> {
     let conn = &data.conn;
     let template = &data.templates;
@@ -121,7 +135,10 @@ async fn edit(data: web::Data<AppState>, id: web::Path<i32>) -> Result<HttpRespo
     Ok(HttpResponse::Ok().content_type("text/html").body(body?))
 }
 
-#[post("/{id}")]
+#[post(
+    "/{id}",
+    wrap = r#"SayHi::new("update", Role::Manager, vec![Permission::Publish])"#
+)]
 async fn update(
     data: web::Data<AppState>,
     id: web::Path<i32>,
@@ -140,7 +157,10 @@ async fn update(
         .finish())
 }
 
-#[post("/delete/{id}")]
+#[post(
+    "/delete/{id}",
+    wrap = r#"SayHi::new("delete", Role::Owner, vec![Permission::All])"#
+)]
 async fn delete(data: web::Data<AppState>, id: web::Path<i32>) -> Result<HttpResponse, Error> {
     let conn = &data.conn;
     let id = id.into_inner();
