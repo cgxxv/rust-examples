@@ -59,6 +59,7 @@ pub fn validate_jwt(token: &str) -> Result<Claims, jsonwebtoken::errors::Error> 
     }
 }
 
+#[allow(unused)]
 pub async fn validator(
     req: ServiceRequest,
     auth: BearerAuth,

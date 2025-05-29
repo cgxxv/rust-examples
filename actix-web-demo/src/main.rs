@@ -10,7 +10,7 @@ use actix_web::{
     dev::{Service, ServiceRequest, ServiceResponse, Transform},
     middleware::Logger,
 };
-use actix_web_httpauth::middleware::HttpAuthentication;
+// use doc::openapi_yaml;
 use futures::future::LocalBoxFuture;
 use serde::{Deserialize, Serialize};
 use utoipa::{OpenApi, ToSchema};
@@ -23,6 +23,7 @@ use utoipa_swagger_ui::SwaggerUi;
 mod account;
 mod auth;
 mod doc;
+mod model;
 mod org;
 mod user;
 

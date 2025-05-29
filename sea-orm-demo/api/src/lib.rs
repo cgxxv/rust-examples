@@ -102,11 +102,20 @@ async fn create(
         .finish())
 }
 
+#[get("/api/v2/foo/bar/{group:.+}")]
+async fn hello() -> Result<HttpResponse, Error> {
+    Ok(HttpResponse::Ok()
+        .content_type("text/html")
+        .body("this is a test"))
+}
+
+// /foo/bar/{group:.+}/abc/{user}
 #[get(
     r#"/{id:\d+}"#,
     wrap = r#"SayHi::new("edit", Role::Manager, vec![Permission::Publish])"#
 )]
 async fn edit(data: web::Data<AppState>, id: web::Path<i32>) -> Result<HttpResponse, Error> {
+    dbg!(&data);
     let conn = &data.conn;
     let template = &data.templates;
     let id = id.into_inner();

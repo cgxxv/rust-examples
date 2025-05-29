@@ -3,22 +3,24 @@ use utoipa::{
     Modify, OpenApi,
     openapi::security::{ApiKey, ApiKeyValue, HttpAuthScheme, HttpBuilder, SecurityScheme},
 };
+use utoipauto::utoipauto;
 
-use crate::user;
+// use crate::model::{group, user};
 
-#[get("/api-docs/openapi.json")]
-async fn openapi_json() -> HttpResponse {
-    HttpResponse::Ok()
-        .content_type("application/json")
-        .body(ApiDoc::openapi().to_json().unwrap())
-}
+// #[get("/api-docs/openapi.json")]
+// async fn openapi_json() -> HttpResponse {
+//     HttpResponse::Ok()
+//         .content_type("application/json")
+//         .body(ApiDoc::openapi().to_json().unwrap())
+// }
 
-#[get("/api-docs/openapi.yaml")]
-pub async fn openapi_yaml() -> impl Responder {
-    let yaml = serde_yaml::to_string(&ApiDoc::openapi()).unwrap();
-    HttpResponse::Ok().content_type("text/yaml").body(yaml)
-}
+// #[get("/api-docs/openapi.yaml")]
+// pub async fn openapi_yaml() -> impl Responder {
+//     let yaml = serde_yaml::to_string(&ApiDoc::openapi()).unwrap();
+//     HttpResponse::Ok().content_type("text/yaml").body(yaml)
+// }
 
+#[utoipauto]
 #[derive(OpenApi)]
 #[openapi(
     // 统一前缀的方式
@@ -26,9 +28,10 @@ pub async fn openapi_yaml() -> impl Responder {
     //     (url = "/api/v1", description = "API 主服务器"),
     //     (url = "/api/v1/staging", description = "测试服务器"),
     // ),
-    components(
-        schemas(user::User),
-    ),
+    // components(
+    //     schemas(user::Model),
+    //     schemas(group::Model),
+    // ),
     tags(
         (name = "orgs", description = "Org management"),
         (name = "users", description = "User management")
