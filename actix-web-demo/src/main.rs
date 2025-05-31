@@ -1,8 +1,8 @@
 use std::{
-    error::Error,
     fs,
     future::{self, Ready},
     net::Ipv4Addr,
+    time::Duration,
 };
 
 use actix_web::{
@@ -10,9 +10,9 @@ use actix_web::{
     dev::{Service, ServiceRequest, ServiceResponse, Transform},
     middleware::Logger,
 };
-// use doc::openapi_yaml;
 use futures::future::LocalBoxFuture;
 use serde::{Deserialize, Serialize};
+use tokio::sync::broadcast;
 use utoipa::{OpenApi, ToSchema};
 use utoipa_actix_web::AppExt;
 use utoipa_rapidoc::RapiDoc;
@@ -41,8 +41,23 @@ pub enum ErrorResponse {
     Unauthorized(String),
 }
 
+async fn background_task(index: usize, mut shutdown_rx: broadcast::Receiver<()>) {
+    loop {
+        tokio::select! {
+            _ = shutdown_rx.recv() => {
+                println!("#{} 后台任务收到退出信号，准备退出", index);
+                break;
+            }
+            _ = tokio::time::sleep(Duration::from_secs(5)) => {
+                println!("#{} 后台任务运行中...", index);
+            }
+        }
+    }
+    println!("#{} 后台任务已退出", index);
+}
+
 #[actix_web::main]
-async fn main() -> Result<(), impl Error> {
+async fn main() -> std::io::Result<()> {
     env_logger::init();
 
     // 生成 YAML 格式
@@ -51,7 +66,7 @@ async fn main() -> Result<(), impl Error> {
 
     let jwt_config = auth::jwt::JwtConfig::new("your-secret-key".to_string(), 24);
 
-    HttpServer::new(move || {
+    let server = HttpServer::new(move || {
         // 统一前缀的方式
         // let app = App::new().wrap(Logger::default()).service(
         //     web::scope("/api/v1")
@@ -98,18 +113,70 @@ async fn main() -> Result<(), impl Error> {
             .openapi_service(|api| {
                 SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-docs/openapi.json", api)
             })
-            // There is no need to create RapiDoc::with_openapi because the OpenApi is served
-            // via SwaggerUi. Instead we only make rapidoc to point to the existing doc.
-            //
-            // If we wanted to serve the schema, the following would work:
-            // .openapi_service(|api| RapiDoc::with_openapi("/api-docs/openapi2.json", api).path("/rapidoc"))
             .map(|app| app.service(RapiDoc::new("/api-docs/openapi.json").path("/rapidoc")))
             .openapi_service(|api| Scalar::with_url("/scalar", api))
             .into_app()
     })
     .bind((Ipv4Addr::UNSPECIFIED, 8088))?
-    .run()
-    .await
+    .disable_signals()
+    .run();
+
+    let server_handle = server.handle();
+    let srv_handle = tokio::spawn({
+        async {
+            server.await.ok();
+            println!("HTTP Server 已退出");
+        }
+    });
+
+    let (shutdown_tx, _) = broadcast::channel::<()>(1);
+    for index in 0..10 {
+        let background_shutdown_rx = shutdown_tx.subscribe();
+        tokio::spawn(background_task(index, background_shutdown_rx));
+    }
+
+    let shutdown_signal = async {
+        #[cfg(unix)]
+        {
+            use actix_web::rt::signal::unix::SignalKind;
+            use actix_web::rt::signal::unix::signal;
+
+            // 监听 SIGINT 和 SIGTERM
+            let mut sigint = signal(SignalKind::interrupt()).unwrap();
+            let mut sigterm = signal(SignalKind::terminate()).unwrap();
+
+            tokio::select! {
+                _ = sigint.recv() => {
+                    println!("收到 SIGINT，开始退出流程");
+                }
+                _ = sigterm.recv() => {
+                    println!("收到 SIGTERM，开始退出流程");
+                }
+            }
+        }
+
+        #[cfg(not(unix))]
+        {
+            actix_web::rt::signal::ctrl_c().await?;
+            println!("收到 Ctrl-C 信号，准备退出...");
+        }
+    };
+
+    println!("receiving for shutdown signal");
+    shutdown_signal.await;
+    println!("received shutdown signal");
+
+    // 通知所有任务退出
+    shutdown_tx.send(()).ok();
+    println!("start to shutdown http server");
+
+    // 优雅停止 HTTP server（会等到请求处理完成）
+    server_handle.stop(true).await;
+    // 等待 HTTP server 完全退出
+    srv_handle.await.ok();
+
+    println!("主程序退出完成");
+    Ok(())
 }
 
 /// Require api key middleware will actually require valid api key

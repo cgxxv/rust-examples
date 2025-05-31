@@ -25,3 +25,5 @@ actix-web-httpauth = "0.8"
 jsonwebtoken = "9.3"
 chrono = "0.4"
 paste = "1.0"
+
+tokio = { version = "1.45", features = ["full"] }

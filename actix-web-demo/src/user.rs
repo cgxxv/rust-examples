@@ -1,7 +1,4 @@
-use actix_web::{
-    Responder, get, post,
-    web::{self, ServiceConfig},
-};
+use actix_web::{Responder, get, post, web};
 
 use crate::model::{group, user};
 

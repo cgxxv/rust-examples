@@ -1,4 +1,3 @@
-use actix_web::{HttpResponse, Responder, get};
 use utoipa::{
     Modify, OpenApi,
     openapi::security::{ApiKey, ApiKeyValue, HttpAuthScheme, HttpBuilder, SecurityScheme},
