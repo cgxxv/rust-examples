@@ -22,3 +22,23 @@ fn main() {
     dog.speak();
     dog2.speak();
 }
+
+
+// trait Animal {
+//     fn speak(&self);
+// }
+
+// #[derive(Clone)]
+// struct Dog;
+// impl Animal for Dog {
+//     fn speak(&self) {
+//         println!("Woof!");
+//     }
+// }
+
+// fn main() {
+//     let dog: Box<dyn Animal> = Box::new(Dog);
+    
+//     // ❌ 错误：clone() 方法不在 dyn Animal 的 vtable 中
+//     // let dog2 = dog.clone();
+// }
