@@ -12,7 +12,7 @@ use actix_web::{
 };
 use futures::future::LocalBoxFuture;
 use serde::{Deserialize, Serialize};
-use tokio::sync::broadcast;
+use tokio::sync::watch;
 use utoipa::{OpenApi, ToSchema};
 use utoipa_actix_web::AppExt;
 use utoipa_rapidoc::RapiDoc;
@@ -41,10 +41,10 @@ pub enum ErrorResponse {
     Unauthorized(String),
 }
 
-async fn background_task(index: usize, mut shutdown_rx: broadcast::Receiver<()>) {
+async fn background_task(index: usize, mut shutdown_rx: watch::Receiver<()>) {
     loop {
         tokio::select! {
-            _ = shutdown_rx.recv() => {
+            _ = shutdown_rx.changed() => {
                 println!("#{} 后台任务收到退出信号，准备退出", index);
                 break;
             }
@@ -129,8 +129,9 @@ async fn main() -> std::io::Result<()> {
         }
     });
 
-    let (shutdown_tx, _) = broadcast::channel::<()>(1);
+    let (shutdown_tx, shutdown_rx) = watch::channel(());
     for index in 0..10 {
+        // let background_shutdown_rx = shutdown_rx.clone();
         let background_shutdown_rx = shutdown_tx.subscribe();
         tokio::spawn(background_task(index, background_shutdown_rx));
     }
