@@ -22,7 +22,8 @@ where
     f(); // 可以多次调用，只读环境
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let name = String::from("Rust");
 
     // Fn: 只读借用
@@ -48,4 +49,18 @@ fn main() {
         // `s` 被 move 进闭包，不能再调用 f3 第二次
     };
     call_fn_once(f3);
+
+    boxed_async!((x: usize) => {
+        {
+            println!("Hello, {}", x);
+            Ok(())
+        }.await
+    });
+}
+
+#[macro_export]
+macro_rules! boxed_async {
+    (($($arg:tt)*) => $body:block) => {
+        Box::new(move |$($arg)*| Box::pin(async move $body ))
+    };
 }
