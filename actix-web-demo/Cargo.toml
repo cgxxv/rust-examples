@@ -27,3 +27,4 @@ chrono = "0.4"
 paste = "1.0"
 
 tokio = { version = "1.45", features = ["full"] }
+tokio-util = { version = "0.7", features = ["full"] }
