@@ -12,12 +12,34 @@ env_logger = "0.11"
 log = "0.4"
 futures = "0.3"
 
-utoipa = { version = "5.3", features = ["actix_extras"] }
-utoipa-swagger-ui = { version = "9.0", features = ["actix-web"] }
-utoipa-redoc = { version = "6.0", features = ["actix-web"] }
-utoipa-rapidoc = { version = "6.0", features = ["actix-web"] }
-utoipa-scalar = { version = "0.3", features = ["actix-web"] }
-utoipa-actix-web = "0.1"
+# utoipa = { version = "5.4", features = ["actix_extras"] }
+# utoipa-swagger-ui = { version = "9.0", features = ["actix-web"] }
+# utoipa-redoc = { version = "6.0", features = ["actix-web"] }
+# utoipa-rapidoc = { version = "6.0", features = ["actix-web"] }
+# utoipa-scalar = { version = "0.3", features = ["actix-web"] }
+# utoipa-actix-web = "0.1"
+
+utoipa = { version = "5.4", path = "/Volumes/980/Codes/utoipa/utoipa", features = [
+    "actix_extras",
+    # "auto_into_responses",
+    "debug",
+    "macros",
+    "url",
+    "yaml",
+], default-features = false } # utoipauto = "0.2"
+utoipa-actix-web = { version = "0.1", path = "/Volumes/980/Codes/utoipa/utoipa-actix-web" }
+utoipa-rapidoc = { version = "6.0", path = "/Volumes/980/Codes/utoipa/utoipa-rapidoc", features = [
+    "actix-web",
+] }
+utoipa-redoc = { version = "6.0", path = "/Volumes/980/Codes/utoipa/utoipa-redoc", features = [
+    "actix-web",
+] }
+utoipa-scalar = { version = "0.3", path = "/Volumes/980/Codes/utoipa/utoipa-scalar", features = [
+    "actix-web",
+] }
+utoipa-swagger-ui = { version = "9.0", path = "/Volumes/980/Codes/utoipa/utoipa-swagger-ui", features = [
+    "actix-web",
+] }
 utoipauto = "0.3.0-alpha.2"
 # utoipauto = { path = "/Volumes/980/Codes/utoipauto/utoipauto" }
 

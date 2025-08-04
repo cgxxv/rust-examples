@@ -1,0 +1,15 @@
+[package]
+name = "openssl-vendored-demo"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+# vendored = ["openssl/vendored"]
+
+[dependencies]
+# openssl = { version = "0.10" }
+openssl = { version = "0.10", features = ["vendored"] }
+# openssl-sys = { version = "0.9.109" }
+
+# [patch.crates-io]
+# openssl-sys = { version = "0.9.109" }

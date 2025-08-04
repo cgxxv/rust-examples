@@ -1,0 +1,7 @@
+# .cargo/config.toml
+[env]
+# OPENSSL_STATIC = "1"
+# OPENSSL_NO_VENDOR = "0"
+# OPENSSL_DIR = ""
+# OPENSSL_INCLUDE_DIR = ""
+# OPENSSL_LIB_DIR = ""

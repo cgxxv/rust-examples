@@ -32,7 +32,10 @@ pub(super) fn configure_utoipa() -> impl FnOnce(&mut utoipa_actix_web::service_c
         ("orgs" = String, Path, description = "组织路径（如 'a/b/c'）"),
         ("repo" = String, Path, description = "仓库名")
     ),
-    tag = ORGS
+    extensions(
+        ("x-openapi-doc" = json!(cfg!(debug_assertions))),
+    ),
+    tag = ORGS,
 )]
 #[get("/{repo}")] // `.+` 表示至少一个 org，后面必须跟一个 repo
 async fn handle_repo(path: web::Path<(String, String)>) -> impl Responder {
