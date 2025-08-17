@@ -25,6 +25,7 @@ mod auth;
 mod doc;
 mod model;
 mod org;
+mod sse;
 mod user;
 
 const API_KEY_NAME: &str = "todo_apikey";
@@ -107,7 +108,8 @@ async fn main() -> std::io::Result<()> {
                         utoipa_actix_web::scope("/users")
                             .wrap(auth_middleware)
                             .configure(user::configure_utoipa()),
-                    ),
+                    )
+                    .service(utoipa_actix_web::scope("/sse").configure(sse::configure_utoipa())),
             )
             .openapi_service(|api| Redoc::with_url("/redoc", api))
             .openapi_service(|api| {
@@ -117,7 +119,7 @@ async fn main() -> std::io::Result<()> {
             .openapi_service(|api| Scalar::with_url("/scalar", api))
             .into_app()
     })
-    .bind((Ipv4Addr::UNSPECIFIED, 8088))?
+    .bind((Ipv4Addr::UNSPECIFIED, 8000))?
     .disable_signals()
     .run();
 

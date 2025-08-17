@@ -19,7 +19,7 @@ futures = "0.3"
 # utoipa-scalar = { version = "0.3", features = ["actix-web"] }
 # utoipa-actix-web = "0.1"
 
-utoipa = { version = "5.4", path = "/Volumes/980/Codes/utoipa/utoipa", features = [
+utoipa = { version = "5.4", features = [
     "actix_extras",
     # "auto_into_responses",
     "debug",
@@ -27,19 +27,11 @@ utoipa = { version = "5.4", path = "/Volumes/980/Codes/utoipa/utoipa", features 
     "url",
     "yaml",
 ], default-features = false } # utoipauto = "0.2"
-utoipa-actix-web = { version = "0.1", path = "/Volumes/980/Codes/utoipa/utoipa-actix-web" }
-utoipa-rapidoc = { version = "6.0", path = "/Volumes/980/Codes/utoipa/utoipa-rapidoc", features = [
-    "actix-web",
-] }
-utoipa-redoc = { version = "6.0", path = "/Volumes/980/Codes/utoipa/utoipa-redoc", features = [
-    "actix-web",
-] }
-utoipa-scalar = { version = "0.3", path = "/Volumes/980/Codes/utoipa/utoipa-scalar", features = [
-    "actix-web",
-] }
-utoipa-swagger-ui = { version = "9.0", path = "/Volumes/980/Codes/utoipa/utoipa-swagger-ui", features = [
-    "actix-web",
-] }
+utoipa-actix-web = { version = "0.1" }
+utoipa-rapidoc = { version = "6.0", features = ["actix-web"] }
+utoipa-redoc = { version = "6.0", features = ["actix-web"] }
+utoipa-scalar = { version = "0.3", features = ["actix-web"] }
+utoipa-swagger-ui = { version = "9.0", features = ["actix-web"] }
 utoipauto = "0.3.0-alpha.2"
 # utoipauto = { path = "/Volumes/980/Codes/utoipauto/utoipauto" }
 
@@ -50,3 +42,5 @@ paste = "1.0"
 
 tokio = { version = "1.45", features = ["full"] }
 tokio-util = { version = "0.7", features = ["full"] }
+futures-util = "0.3"
+bytes = { version = "1.10", features = ["serde"], default-features = false }

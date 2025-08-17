@@ -1,7 +1,6 @@
-use actix_web::{
-    Responder, get,
-    web::{self, ServiceConfig},
-};
+use actix_web::Responder;
+use actix_web::get;
+use actix_web::web::{self, ServiceConfig};
 
 const ORGS: &str = "orgs";
 
@@ -42,7 +41,7 @@ async fn handle_repo(path: web::Path<(String, String)>) -> impl Responder {
     let (orgs, repo) = path.into_inner();
     let org_list: Vec<&str> = orgs.split('/').collect();
 
-    format!("Orgs: {:?}, Repo: {}", org_list, repo)
+    format!("Orgs: {org_list:?}, Repo: {repo}")
 }
 
 #[utoipa::path(
@@ -60,5 +59,5 @@ async fn handle_orgs(path: web::Path<String>) -> impl Responder {
     let orgs = path.into_inner();
     let org_list: Vec<&str> = orgs.split('/').collect();
 
-    format!("Orgs: {:?}", org_list)
+    format!("Orgs: {org_list:?}")
 }
