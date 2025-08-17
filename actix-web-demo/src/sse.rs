@@ -1,6 +1,7 @@
 use actix_web::HttpResponse;
 use actix_web::Responder;
 use actix_web::get;
+use actix_web::http::header::ContentEncoding;
 use bytes::Bytes;
 use futures_util::Stream;
 use std::pin::Pin;
@@ -47,6 +48,7 @@ async fn handle_ping() -> impl Responder {
     HttpResponse::Ok()
         .content_type("text/event-stream")
         .insert_header(("Cache-Control", "no-cache"))
+        .insert_header(ContentEncoding::Identity) // important for eventsource, when using global compress
         .streaming(Sse {
             keep_alive: interval(Duration::from_secs(1)),
         })
